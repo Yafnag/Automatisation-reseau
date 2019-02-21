@@ -41,38 +41,31 @@ def generate_dhcp_subnet(subnet):
     netmask = socket.inet_ntoa(struct.pack('!I', (1 << 32) - (1 << host_bits)))
     net = ipaddress.IPv4Network(network + '/' + netmask, False)
     broadcast_addr = str(net.broadcast_address)
-
-    subnet_list.append(network)
-    netmask_list.append(netmask)
-    broadcast_address_list.append(broadcast_addr)
     
-    split_router_addr = broadcast_addr.split('.')
-    split_router_addr[3] = str(int(split_router_addr[3]) - 1)
-    routers = ".".join(split_router_addr)
+    routers = str(ipaddress.ip_address(broadcast_addr) - 1)
 
-    routers_list.append(routers)
-
-    split_ip_end = routers.split('.')
-    split_ip_end[3] = str(int(split_ip_end[3]) - 1)
-    ip_range_end = ".".join(split_ip_end)
-
-    split_first_ip = network.split('.')
-    split_first_ip[3] = str(int(split_first_ip[3]) + 1)
-    ip_range_first = ".".join(split_first_ip)
-
+    ip_range_end = str(ipaddress.ip_address(routers) -1)
+    ip_range_first = str(ipaddress.ip_address(network) + 1)
     ip_range = ip_range_first + " " + ip_range_end
 
-    ip_range_list.append(ip_range)
+    if network != "" and netmask != "" and routers != "" and ip_range != " " and broadcast_addr != "" :
+        subnet_list.append(network)
+        netmask_list.append(netmask)
+        routers_list.append(routers)
+        ip_range_list.append(ip_range)
+        broadcast_address_list.append(broadcast_addr)
+    else :
+        sys.exit("Erreur lors du remplissage des listes subnet")
 
 def generate_vlan_interface(interface_name):
     vlan_dict['vlan-raw-device'] = interface_name
     vlan_config = ""
     for i in range (len(subnet_dict.get("subnet"))):
-        vlan_config += "auto " + vlan_dict['auto'] + str(i) + "\n"
-        vlan_config += "iface " + vlan_dict['auto'] + str(i) + " inet " + vlan_dict['inet'] + "\n"
+        vlan_config += "auto " + vlan_dict['auto'] + str(i+1) + "\n"
+        vlan_config += "iface " + vlan_dict['auto'] + str(i+1) + " inet " + vlan_dict['inet'] + "\n"
         vlan_config += "\tvlan-raw-device " + vlan_dict['vlan-raw-device'] + "\n"
         vlan_config += "\taddress " + vlan_dict['address'][i] + "\n"
-        vlan_config += "\tnetmask " + vlan_dict['netmask'][i] + "\n"
+        vlan_config += "\tnetmask " + vlan_dict['netmask'][i] + "\n\n"
     return vlan_config
 
 def main(argv):

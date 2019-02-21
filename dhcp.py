@@ -19,11 +19,21 @@ ip_range_list = []
 broadcast_address_list = []
 
 subnet_dict = {
-    'subnet ' : subnet_list,
-    ' netmask ' : netmask_list,
-    'option routers ' : routers_list,
-    'range ' : ip_range_list,
-    'option broadcast-address ' : broadcast_address_list}
+    'subnet' : subnet_list,
+    'netmask' : netmask_list,
+    'routers' : routers_list,
+    'range' : ip_range_list,
+    'broadcast' : broadcast_address_list}
+
+device_name = ""
+
+vlan_dict = {
+    'auto' : 'vlan',
+    'iface' : 'vlan',
+    'inet' : 'static',
+    'vlan-raw-device' : device_name,
+    'address' : routers_list,
+    'netmask' : netmask_list }
 
 def generate_dhcp_subnet(subnet):    
     network, net_bits = subnet.split('/')
@@ -54,6 +64,16 @@ def generate_dhcp_subnet(subnet):
 
     ip_range_list.append(ip_range)
 
+def generate_vlan_interface(interface_name):
+    vlan_dict['vlan-raw-device'] = interface_name
+    vlan_config = ""
+    for i in range (len(subnet_dict.get("subnet"))):
+        vlan_config += "auto " + vlan_dict['auto'] + str(i) + "\n"
+        vlan_config += "iface " + vlan_dict['auto'] + str(i) + " inet " + vlan_dict['inet'] + "\n"
+        vlan_config += "\tvlan-raw-device " + vlan_dict['vlan-raw-device'] + "\n"
+        vlan_config += "\taddress " + vlan_dict['address'][i] + "\n"
+        vlan_config += "\tnetmask " + vlan_dict['netmask'][i] + "\n"
+    return vlan_config
 
 def main(argv):
     for subnet in argv:
@@ -64,17 +84,15 @@ def main(argv):
     for conf_str, conf_value in dhcp_dict.items():
         dhcp_config += conf_str + str(conf_value) + ";\n"
 
-    for i in range (len(subnet_dict.get("subnet "))):
-        for subnet_str, subnet_value in subnet_dict.items():
-            if subnet_str == "subnet ":
-                dhcp_config += subnet_str + subnet_value[i]
-            elif subnet_str == " netmask ":
-                dhcp_config += subnet_str + subnet_value[i] + " {\n"
-            elif subnet_str == "option broadcast-address ": #broadcast-addr doit être en dernier dans le dictionnaire, on ferme la déclaration subnet après cette valeur
-                dhcp_config += "\t" + subnet_str + subnet_value[i] + ";\n}\n\n"
-            else :
-                dhcp_config += "\t" + subnet_str + subnet_value[i] + ";\n"
+    for i in range (len(subnet_dict.get("subnet"))): #on récupère le nombre de subnet à déclarer et on boucle
+        dhcp_config += "subnet " +  subnet_dict['subnet'][i] + " netmask " + subnet_dict['netmask'][i] + " {\n"
+        dhcp_config += "\toption routers " + subnet_dict['routers'][i] + ";\n"
+        dhcp_config += "\trange " + subnet_dict['range'][i] + ";\n"
+        dhcp_config += "\toption broadcast-address " + subnet_dict['broadcast'][i] + ";\n}\n\n"
+
+    vlan_config = generate_vlan_interface("enp0s3")
     print(dhcp_config)
+    print(vlan_config)
                 
             
 

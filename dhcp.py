@@ -69,6 +69,9 @@ def generate_vlan_interface(interface_name):
     return vlan_config
 
 def main(argv):
+    DNS = input("Renseignez le(s) serveur(s) DNS :")
+    dhcp_dict['option domain-name-servers '] = DNS
+    print("\n\n---------------------------------------------------------------------------\n\n")
     for subnet in argv:
         generate_dhcp_subnet(subnet)
 
@@ -78,15 +81,38 @@ def main(argv):
         dhcp_config += conf_str + str(conf_value) + ";\n"
 
     for i in range (len(subnet_dict.get("subnet"))): #on récupère le nombre de subnet à déclarer et on boucle
-        dhcp_config += "subnet " +  subnet_dict['subnet'][i] + " netmask " + subnet_dict['netmask'][i] + " {\n"
+        dhcp_config += "\nsubnet " +  subnet_dict['subnet'][i] + " netmask " + subnet_dict['netmask'][i] + " {\n"
         dhcp_config += "\toption routers " + subnet_dict['routers'][i] + ";\n"
         dhcp_config += "\trange " + subnet_dict['range'][i] + ";\n"
-        dhcp_config += "\toption broadcast-address " + subnet_dict['broadcast'][i] + ";\n}\n\n"
+        dhcp_config += "\toption broadcast-address " + subnet_dict['broadcast'][i] + ";\n}\n"
 
-    vlan_config = generate_vlan_interface("enp0s3")
     print(dhcp_config)
+    print("\n\n---------------------------------------------------------------------------\n\n")
+    confirm_dhcp_conf = input("Cette configuration DHCP vous convient-elle ? (Y/N)")
+
+    if confirm_dhcp_conf == "Y" :
+        dhcpd = open("dhcpd.conf", "w")
+        dhcpd.write(dhcp_config)
+        dhcpd.close()
+        print("Le fichier dhcpd.conf a été généré\n\n")
+    else :
+        sys.exit("Relancer le script afin de générer la configuration DHCP qui vous convient")
+
+    iface_name = input("Nom de la carte réseau sur laquelle générer les VLANs :")
+    print("\n\n---------------------------------------------------------------------------\n\n")
+    vlan_config = generate_vlan_interface(iface_name)
     print(vlan_config)
-                
+    print("\n\n---------------------------------------------------------------------------\n\n")
+
+    confirm_vlan_conf = input("La configuration VLAN vous convient-elle ? (Y/N)")
+
+    if confirm_vlan_conf == "Y" :
+        interfaces = open("interfaces", "a")
+        interfaces.write("\n\n" + vlan_config)
+        interfaces.close()
+        print("Le fichier interface a été modifié")
+    else :
+        sys.exit("Relancer le script afin de générer la configuration VLAN qui vous convient")
             
 
 if __name__ == "__main__":

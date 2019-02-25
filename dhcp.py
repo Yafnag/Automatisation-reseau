@@ -5,6 +5,8 @@ import socket
 import struct
 import ipaddress
 import sys
+import os
+import shutil
 
 DNS = ""
 dhcp_dict = {
@@ -91,6 +93,8 @@ def main(argv):
     confirm_dhcp_conf = input("Cette configuration DHCP vous convient-elle ? (Y/N)")
 
     if confirm_dhcp_conf == "Y" :
+        if os.path.isfile('./dhcpd.conf'):
+            os.rename('./dhcpd.conf','./dhcpd.conf.bak')
         dhcpd = open("dhcpd.conf", "w")
         dhcpd.write(dhcp_config)
         dhcpd.close()
@@ -107,6 +111,8 @@ def main(argv):
     confirm_vlan_conf = input("La configuration VLAN vous convient-elle ? (Y/N)")
 
     if confirm_vlan_conf == "Y" :
+        if os.path.isfile('./interfaces'):
+            shutil.copyfile('interfaces', 'interfaces.bak')  
         interfaces = open("interfaces", "a")
         interfaces.write("\n\n" + vlan_config)
         interfaces.close()

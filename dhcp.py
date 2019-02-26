@@ -94,9 +94,16 @@ def main(argv):
 
     if confirm_dhcp_conf == "Y" :
         if os.path.isfile('./dhcpd.conf'):
-            os.rename('./dhcpd.conf','./dhcpd.conf.bak')
-        dhcpd = open("dhcpd.conf", "w")
-        dhcpd.write(dhcp_config)
+            try:
+                shutil.copyfile('dhcpd.conf', 'dhcpd.conf.bak')
+            except OSError as err:
+                print("OS error: {0}".format(err))
+
+        try:
+            dhcpd = open("dhcpd.conf", "w")
+            dhcpd.write(dhcp_config)
+        except OSError as err:
+                print("OS error: {0}".format(err))
         dhcpd.close()
         print("Le fichier dhcpd.conf a été généré\n\n")
     else :
@@ -112,9 +119,17 @@ def main(argv):
 
     if confirm_vlan_conf == "Y" :
         if os.path.isfile('./interfaces'):
-            shutil.copyfile('interfaces', 'interfaces.bak')  
-        interfaces = open("interfaces", "a")
-        interfaces.write("\n\n" + vlan_config)
+            try:
+                shutil.copyfile('interfaces', 'interfaces.bak')
+            except OSError as err:
+                print("OS error: {0}".format(err))
+
+        try:
+            interfaces = open("interfaces", "a")
+            interfaces.write("\n\n" + vlan_config)
+        except OSError as err:
+                print("OS error: {0}".format(err))
+                
         interfaces.close()
         print("Le fichier interface a été modifié")
     else :

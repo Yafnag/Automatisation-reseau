@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import unicode_literals
+from ipaddress import IPv4Network
 import socket
 import struct
 import ipaddress
@@ -38,12 +39,11 @@ vlan_dict = {
     'netmask' : netmask_list }
 
 def generate_dhcp_subnet(subnet):    
-    network, net_bits = subnet.split('/')
-    host_bits = 32 - int(net_bits)
-    netmask = socket.inet_ntoa(struct.pack('!I', (1 << 32) - (1 << host_bits)))
-    net = ipaddress.IPv4Network(network + '/' + netmask, False)
-    broadcast_addr = str(net.broadcast_address)
+    net = IPv4Network(subnet)
     
+    netmask = str(IPv4Network(subnet).netmask)
+    network = str(IPv4Network(subnet).network_address)    
+    broadcast_addr = str(net.broadcast_address)    
     routers = str(ipaddress.ip_address(broadcast_addr) - 1)
 
     ip_range_end = str(ipaddress.ip_address(routers) -1)
@@ -98,12 +98,14 @@ def main(argv):
                 shutil.copyfile('dhcpd.conf', 'dhcpd.conf.bak')
             except OSError as err:
                 print("OS error: {0}".format(err))
+                sys.exit("Erreur lors du backup de dhcpd.conf")
 
         try:
             dhcpd = open("dhcpd.conf", "w")
             dhcpd.write(dhcp_config)
         except OSError as err:
                 print("OS error: {0}".format(err))
+                sys.exit("Erreur lors de l'écriture du fichier dhcpd.conf")
         dhcpd.close()
         print("Le fichier dhcpd.conf a été généré\n\n")
     else :
@@ -123,13 +125,14 @@ def main(argv):
                 shutil.copyfile('interfaces', 'interfaces.bak')
             except OSError as err:
                 print("OS error: {0}".format(err))
+                sys.exit("Erreur lors du backup du fichier interfaces")
 
         try:
             interfaces = open("interfaces", "a")
             interfaces.write("\n\n" + vlan_config)
         except OSError as err:
                 print("OS error: {0}".format(err))
-                
+                sys.exit("Erreur lors de l'écriture du fichier interfaces")
         interfaces.close()
         print("Le fichier interface a été modifié")
     else :

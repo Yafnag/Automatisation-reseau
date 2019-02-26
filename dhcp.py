@@ -140,5 +140,6 @@ def main(argv):
             
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    order_network = sorted(sys.argv[1:], key=lambda x: int(x.rsplit('/',1)[1]))
+    main(order_network)
 

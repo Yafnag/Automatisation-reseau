@@ -8,6 +8,8 @@ import ipaddress
 import sys
 import os
 import shutil
+import argparse
+from argparse import RawTextHelpFormatter
 
 DNS = ""
 dhcp_dict = {
@@ -140,6 +142,16 @@ def main(argv):
             
 
 if __name__ == "__main__":
-    order_network = sorted(sys.argv[1:], key=lambda x: int(x.rsplit('/',1)[1]))
+    parser=argparse.ArgumentParser(
+        description="Pour executer le script il faut commencer par editer le fichier de configuration conf.yaml.\n"+
+        "- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne option domain-name-servers.\n"+
+        "- Renseigner le nom de l'interface réseau sur laquel seront généré les VLANs à la ligne device_name = EXAMPLE\n\n"+
+        "python dhcp.py -s subnet1/netmask1CIDR subnet2/netmask2CIDR...\n\n"+
+        "Exemple :\n"+
+        "python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29", formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-s','--subnets', nargs='+', default=[])
+    args=parser.parse_args()
+
+    order_network = sorted(args.subnets, key=lambda x: int(x.rsplit('/',1)[1]))
     main(order_network)
 

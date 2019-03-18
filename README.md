@@ -6,9 +6,9 @@ Le but de ce script est de générer de manière automatique une configuration D
 `dhcp.py -h`
 Le script est dotté d'un arguement "-h" afin de consulter l'aide concernant l'utilisation de ce dernier.
 
-Afin d'executer le script il faut commencer par editer le fichier de configuration conf.yaml :
-	- Renseigner les serveurs DNS qui seront attribué par le serveur DHCP à la ligne `option domain-name-servers`
-	- Renseigner le nom de l'interface réseau sur laquel seront généré les VLANs à la ligne `device_name = "EXAMPLE"`
+Afin d'executer le script il faut commencer par editer le fichier de configuration conf.yaml.
+	- Renseigner les serveurs DNS qui seront attribué par le serveur DHCP à la ligne `option domain-name-servers`.
+	- Renseigner le nom de l'interface réseau sur laquel seront généré les VLANs à la ligne `device_name = "EXAMPLE"`.
 	
 Une fois le fichier de configuration modifié et sauvegarder il suffit d'éxecuter le script de la manière suivante :
 `python dhcp.py subnet1/netmask1CIDR subnet2/netmask2CIDR...`

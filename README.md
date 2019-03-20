@@ -28,8 +28,11 @@ Il faut donc appeler notre script de la manière suivante :<br/><br/>
 
 Automatiquement le script va génrer la configuration DHCP et demander confirmation avant de l'exporter<br/><br/>
 ```shell
-Cette configuration DHCP vous convient-elle ? (Y/N)```<br/><br/>
+Cette configuration DHCP vous convient-elle ? (Y/N)
+```
+<br/><br/>
 
 Idem pour la configuration du fichier interfaces <br/><br/>
 ```shell
-La configuration VLAN vous convient-elle ? (Y/N)```
+La configuration VLAN vous convient-elle ? (Y/N)
+```

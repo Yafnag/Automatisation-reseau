@@ -30,7 +30,7 @@ Automatiquement le script va génrer la configuration DHCP et demander confirmat
 ```shell
 Cette configuration DHCP vous convient-elle ? (Y/N)
 ```
-<br/><br/>
+<br/>
 
 Idem pour la configuration du fichier interfaces <br/><br/>
 ```shell

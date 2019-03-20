@@ -119,9 +119,9 @@ def main(argv):
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser(
-        description="Pour executer le script il faut commencer par editer le fichier de configuration conf.yaml.\n"+
-        "- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne option domain-name-servers.\n"+
-        "- Renseigner le nom de l'interface réseau sur laquel seront généré les VLANs à la ligne device_name = EXAMPLE\n\n"+
+        description="Pour executer le script il faut editer le fichier de configuration conf.yaml.\n"+
+        "\t- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne option domain-name-servers.\n"+
+        "\t- Renseigner le nom de l'interface réseau sur laquel seront générés les VLANs à la ligne device_name = ENTER_DEVICE_NAME\n\n"+
         "python dhcp.py -s subnet1/netmask1CIDR subnet2/netmask2CIDR...\n\n"+
         "Exemple :\n"+
         "python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29", formatter_class=RawTextHelpFormatter)

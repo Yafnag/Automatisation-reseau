@@ -27,9 +27,9 @@ Il faut donc appeler notre script de la manière suivante :<br/><br/>
 `python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29`<br/><br/>
 
 Automatiquement le script va génrer la configuration DHCP et demander confirmation avant de l'exporter<br/><br/>
-
-`Cette configuration DHCP vous convient-elle ? (Y/N)`<br/><br/>
+```shell
+Cette configuration DHCP vous convient-elle ? (Y/N)```<br/><br/>
 
 Idem pour la configuration du fichier interfaces <br/><br/>
-
-`La configuration VLAN vous convient-elle ? (Y/N)`
+```shell
+La configuration VLAN vous convient-elle ? (Y/N)```

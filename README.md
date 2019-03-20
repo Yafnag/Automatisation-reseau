@@ -3,8 +3,8 @@
 Le but de ce script est de générer de manière automatique une configuration DHCP pour dhcpd qui est un programme de serveur DHCP, et générer les différentes interfaces virtuel qui se configurent dans le fichier "interfaces" de Linux.
 
 ## Utilisation
-`dhcp.py -h`
-Le script est dotté d'un arguement "-h" afin de consulter l'aide concernant l'utilisation de ce dernier.
+`dhcp.py -h` <br/>;
+Le script est dotté d'un arguement "-h" afin de consulter l'aide concernant l'utilisation de ce dernier. <br/>;
 
 Pour executer le script il faut commencer par editer le fichier de configuration conf.yaml.
 	- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne `option domain-name-servers`.

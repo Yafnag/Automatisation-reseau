@@ -1,0 +1,21 @@
+dhcp_dict:
+    default-lease-time : 600
+    max-lease-time  : 7200
+    option domain-name-servers  : "8.8.8.8, 8.8.4.4"
+    
+subnet_dict:
+    subnet : subnet_list
+    netmask : netmask_list
+    routers : routers_list
+    range : ip_range_list
+    broadcast : broadcast_address_list
+
+device_name: "enp0s3"
+
+vlan_dict:
+    auto : "vlan"
+    iface : "vlan"
+    inet : "static"
+    vlan-raw-device : interface_name
+    address : routers_list
+    netmask : netmask_list

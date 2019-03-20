@@ -10,7 +10,7 @@ subnet_dict:
     range : ip_range_list
     broadcast : broadcast_address_list
 
-device_name: "enp0s3"
+device_name: "ENTER_DEVICE_NAME"
 
 vlan_dict:
     auto : "vlan"

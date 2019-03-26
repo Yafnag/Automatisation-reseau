@@ -8,7 +8,7 @@ Le script est dotté d'un arguement "-h" afin de consulter l'aide concernant l'u
 
 Pour executer le script il faut commencer par editer le fichier de configuration conf.yaml.<br/>
 	- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne `option domain-name-servers`. Par défaut ce sont les DNS google qui sont utilisés (8.8.8.8, 8.8.4.4).<br/>
-	- Renseigner le nom de l'interface réseau sur laquel seront généré les VLANs à la ligne `device_name = "ENTER_DEVICE_NAME"`.<br/><br/>
+	- Renseigner le nom de l'interface réseau sur laquel seront généré les VLANs à la ligne `vlan-raw-device`.<br/><br/>
 	
 Une fois le fichier de configuration modifié et sauvegarder il suffit d'éxecuter le script de la manière suivante :<br/>
 `python dhcp.py -s subnet1/netmask1CIDR subnet2/netmask2CIDR...`<br/><br/>

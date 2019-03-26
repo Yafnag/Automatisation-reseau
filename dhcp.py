@@ -42,14 +42,17 @@ def generate_dhcp_subnet(subnet):
     else :
         sys.exit("Erreur lors du remplissage des listes subnet")
 
-def generate_vlan_interface(interface_name):
+def generate_vlan_interface():
     vlan_config = ""
     for i in range (len(subnet_list)):
-        vlan_config += "auto " + yaml.load(open('conf.yaml'))['vlan_dict']['auto'] + str(i+1) + "\n"
-        vlan_config += "iface " + yaml.load(open('conf.yaml'))['vlan_dict']['auto'] + str(i+1) + " inet " + yaml.load(open('conf.yaml'))['vlan_dict']['inet'] + "\n"
-        vlan_config += "\tvlan-raw-device " + eval(yaml.load(open('conf.yaml'))['vlan_dict']['vlan-raw-device']) + "\n"
-        vlan_config += "\taddress " + eval(yaml.load(open('conf.yaml'))['vlan_dict']['address'])[i] + "\n"
-        vlan_config += "\tnetmask " + eval(yaml.load(open('conf.yaml'))['vlan_dict']['netmask'])[i] + "\n\n"
+        vlan_config += "auto {}{}\niface {}{} inet {}\n\tvlan-raw-device {}\n\taddress {}\n\tnetmask {}\n\n".format(conf['vlan_dict']['auto'],
+                                                                                                                  i+1,
+                                                                                                                  conf['vlan_dict']['auto'],
+                                                                                                                  i+1,
+                                                                                                                  conf['vlan_dict']['inet'],
+                                                                                                                  conf['vlan_dict']['vlan-raw-device'],
+                                                                                                                  routers_list[i],
+                                                                                                                  netmask_list[i])
     return vlan_config
 
 def main(argv):
@@ -62,10 +65,11 @@ def main(argv):
         dhcp_config += conf_str + " " + str(conf_value) + ";\n"
 
     for i in range (len(subnet_list)): 
-        dhcp_config += "\nsubnet " + (eval(yaml.load(open('conf.yaml'))['subnet_dict']['subnet']))[i] + " netmask " + (eval(yaml.load(open('conf.yaml'))['subnet_dict']['netmask']))[i] + " {\n"
-        dhcp_config += "\toption routers " + (eval(yaml.load(open('conf.yaml'))['subnet_dict']['routers']))[i] + ";\n"
-        dhcp_config += "\trange " + (eval(yaml.load(open('conf.yaml'))['subnet_dict']['range']))[i] + ";\n"
-        dhcp_config += "\toption broadcast-address " + (eval(yaml.load(open('conf.yaml'))['subnet_dict']['broadcast']))[i] + ";\n}\n"
+        dhcp_config += "\nsubnet {} netmask {}{{\n\toption routers {};\n\trange {};\n\toption broadcast-address {};\n}}\n".format(subnet_list[i],
+                                                                                                                               netmask_list[i],
+                                                                                                                               routers_list[i],
+                                                                                                                               ip_range_list[i],
+                                                                                                                               broadcast_address_list[i])
 
     print(dhcp_config)
     print("\n\n---------------------------------------------------------------------------\n\n")
@@ -90,8 +94,7 @@ def main(argv):
     else :
         sys.exit("Relancer le script afin de générer la configuration DHCP qui vous convient")
 
-    iface_name = yaml.load(open('conf.yaml'))['device_name']
-    vlan_config = generate_vlan_interface(iface_name)
+    vlan_config = generate_vlan_interface()
     print(vlan_config)
     print("\n\n---------------------------------------------------------------------------\n\n")
 
@@ -120,13 +123,19 @@ def main(argv):
 if __name__ == "__main__":
     parser=argparse.ArgumentParser(
         description="Pour executer le script il faut editer le fichier de configuration conf.yaml.\n"+
-        "\t- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne option domain-name-servers.\n"+
-        "\t- Renseigner le nom de l'interface réseau sur laquel seront générés les VLANs à la ligne device_name = ENTER_DEVICE_NAME\n\n"+
+        "\t- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne \"option domain-name-servers\".\n"+
+        "\t- Renseigner le nom de l'interface réseau sur laquel seront générés les VLANs à la ligne \"vlan_raw_device\"\n\n"+
         "python dhcp.py -s subnet1/netmask1CIDR subnet2/netmask2CIDR...\n\n"+
         "Exemple :\n"+
         "python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29", formatter_class=RawTextHelpFormatter)
     parser.add_argument('-s','--subnets', nargs='+', default=[])
     args=parser.parse_args()
+
+    try:
+        conf = yaml.load(open('conf.yaml'))
+    except OSError as err:
+        print("OS error: {0}".format(err))
+        sys.exit("Erreur lors de l'ouverture du fichier de configuration")
 
     order_network = sorted(args.subnets, key=lambda x: int(x.rsplit('/',1)[1]))
     main(order_network)

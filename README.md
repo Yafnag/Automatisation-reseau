@@ -22,7 +22,7 @@ Afin de générer une configuration DHCP pour les réseaux :<br/>
 	- 192.168.0.176/28<br/>
 	- 192.168.0.192/29<br/><br/>
 	
-Il faut donc appeler notre script de la manière suivante :<br/><br/>
+Il faut donc executer notre script de la manière suivante :<br/><br/>
 
 `python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29`<br/><br/>
 

@@ -36,3 +36,6 @@ Idem pour la configuration du fichier interfaces <br/><br/>
 ```shell
 La configuration VLAN vous convient-elle ? (Y/N)
 ```
+
+## Licence
+License:BSD-3-Clause

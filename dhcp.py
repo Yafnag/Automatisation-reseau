@@ -76,15 +76,15 @@ def main(argv):
     confirm_dhcp_conf = input("Cette configuration DHCP vous convient-elle ? (Y/N)")
 
     if confirm_dhcp_conf == "Y" :
-        if os.path.isfile('./dhcpd.conf'):
+        if os.path.isfile(conf['path_dhcpd'] + conf['dhcpd_file_name']):
             try:
-                shutil.copyfile('dhcpd.conf', 'dhcpd.conf.bak')
+                shutil.copyfile(conf['dhcpd_file_name'], conf['dhcpd_file_name']+'.bak')
             except OSError as err:
                 print("OS error: {0}".format(err))
                 sys.exit("Erreur lors du backup de dhcpd.conf")
 
         try:
-            dhcpd = open("dhcpd.conf", "w")
+            dhcpd = open(conf['dhcpd_file_name'], "w")
             dhcpd.write(dhcp_config)
         except OSError as err:
                 print("OS error: {0}".format(err))
@@ -101,15 +101,15 @@ def main(argv):
     confirm_vlan_conf = input("La configuration VLAN vous convient-elle ? (Y/N)")
 
     if confirm_vlan_conf == "Y" :
-        if os.path.isfile('./interfaces'):
+        if os.path.isfile(conf['path_iface'] + conf['iface_file_name']):
             try:
-                shutil.copyfile('interfaces', 'interfaces.bak')
+                shutil.copyfile(conf['iface_file_name'], conf['iface_file_name']+'.bak')
             except OSError as err:
                 print("OS error: {0}".format(err))
                 sys.exit("Erreur lors du backup du fichier interfaces")
 
         try:
-            interfaces = open("interfaces", "a")
+            interfaces = open(conf['iface_file_name'], "a")
             interfaces.write("\n\n" + vlan_config)
         except OSError as err:
                 print("OS error: {0}".format(err))

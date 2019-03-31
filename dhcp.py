@@ -24,8 +24,8 @@ broadcast_address_list = []
 def generate_dhcp_subnet(subnet):    
     net = IPv4Network(subnet)
     
-    netmask = str(IPv4Network(subnet).netmask)
-    network = str(IPv4Network(subnet).network_address)    
+    netmask = str(net.netmask)
+    network = str(net.network_address)    
     broadcast_addr = str(net.broadcast_address)    
     routers = str(ipaddress.ip_address(broadcast_addr) - 1)
 
@@ -61,7 +61,7 @@ def main(argv):
 
     dhcp_config = ""
 
-    for conf_str, conf_value in yaml.load(open('conf.yaml'))['dhcp_dict'].items():
+    for conf_str, conf_value in conf['dhcp_dict'].items():
         dhcp_config += conf_str + " " + str(conf_value) + ";\n"
 
     for i in range (len(subnet_list)): 

@@ -84,7 +84,7 @@ def main(argv):
                 sys.exit("Erreur lors du backup de dhcpd.conf")
 
         try:
-            dhcpd = open(conf['dhcpd_file_name'], "w")
+            dhcpd = open(conf['path_dhcpd'] + conf['dhcpd_file_name'], "w")
             dhcpd.write(dhcp_config)
         except OSError as err:
                 print("OS error: {0}".format(err))
@@ -109,7 +109,7 @@ def main(argv):
                 sys.exit("Erreur lors du backup du fichier interfaces")
 
         try:
-            interfaces = open(conf['iface_file_name'], "a")
+            interfaces = open(conf['path_iface'] + conf['iface_file_name'], "a")
             interfaces.write("\n\n" + vlan_config)
         except OSError as err:
                 print("OS error: {0}".format(err))

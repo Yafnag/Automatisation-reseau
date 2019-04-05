@@ -2,8 +2,7 @@
 
 Le but de ce script est de générer de manière automatique une configuration DHCP pour dhcpd qui est un programme de serveur DHCP, et générer les différentes interfaces virtuelles dans le fichier "interfaces" de Linux.
 
-## Utilisation
-###Arguments du scripts
+##Arguments du scripts
 `dhcp.py -h` <br/>
 L'arguement "--help" est utilisé afin de consulter l'aide concernant l'utilisation du script.<br/><br/>
 
@@ -13,13 +12,13 @@ L'argument --config est utilisé pour déclarer le fichier de configuration yaml
 `dhcp.py -s 192.168.0.0/24` <br/>
 L'argument --subnets est utilisé pour déclarer les différents subnets à déclarer dans la configuration dhcp.<br/><br/>
 
-###Fichier de configuration
+##Fichier de configuration
 Tout dabord, éditer le fichier de configuration conf.yaml.<br/>
 	- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne `option domain-name-servers`. Par défaut ce sont les DNS google qui sont utilisés (8.8.8.8, 8.8.4.4).<br/>
 	- Renseigner le nom de l'interface réseau sur laquel seront généré les interfaces virtuelles à la ligne `vlan-raw-device`.<br/>
 	- Configurer les chemins d'accès aux fichiers de configurations "isc-dhcp-server", "dhcpd.conf" et "interfaces"<br/><br/>
 	
-###Utilisation du script
+##Utilisation du script
 Une fois la configuration sauvegardée, éxecutez le script de la manière suivante :<br/>
 `python dhcp.py -c path/to/conf.yaml -s subnet1/netmask1CIDR subnet2/netmask2CIDR...`<br/><br/>
 

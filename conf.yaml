@@ -8,13 +8,8 @@ vlan_dict:
     auto : "vlan"
     iface : "vlan"
     inet : "static"
-    vlan-raw-device : "ens33"
+    vlan-raw-device : "enp0s3"
     
-iface_file_name : "interfaces"
-dhcpd_file_name : "dhcpd.conf"
-
-#Chemin vers le fichier de configuration interfaces du systeme d'exploitation
-path_iface: "./"
-
-#Chemin vers le fichier de configuration "dhcpd.conf"
-path_dhcpd : "./"
+iface_file_name : "./interfaces"
+dhcpd_file_name : "./dhcpd.conf"
+dhcp_interface_file : "./isc-dhcp-server"

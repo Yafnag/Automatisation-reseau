@@ -19,6 +19,8 @@ routers_list = []
 ip_range_list = []
 broadcast_address_list = []
 
+iface_list = []
+
 
 
 def generate_dhcp_subnet(subnet):    
@@ -26,13 +28,16 @@ def generate_dhcp_subnet(subnet):
     
     netmask = str(net.netmask)
     network = str(net.network_address)    
-    broadcast_addr = str(net.broadcast_address)    
+    broadcast_addr = str(net.broadcast_address)
+    #L'adresse du routeur est calculée avec l'adresse broadcast -1
     routers = str(ipaddress.ip_address(broadcast_addr) - 1)
 
+    #Fin de ip range est calculée avec l'adresse routeur -1 pour exclure le routeur de la plage d'adresse ip
     ip_range_end = str(ipaddress.ip_address(routers) -1)
     ip_range_first = str(ipaddress.ip_address(network) + 1)
     ip_range = ip_range_first + " " + ip_range_end
 
+    #Test si une variable est vide, si oui exit du script sinon remplissage des listes
     if network != "" and netmask != "" and routers != "" and ip_range != " " and broadcast_addr != "" :
         subnet_list.append(network)
         netmask_list.append(netmask)
@@ -44,26 +49,39 @@ def generate_dhcp_subnet(subnet):
 
 def generate_vlan_interface():
     vlan_config = ""
+    #Boucle sur la longueur de la liste subnet_list pour créer les différentes interfaces
     for i in range (len(subnet_list)):
         vlan_config += "auto {}{}\niface {}{} inet {}\n\tvlan-raw-device {}\n\taddress {}\n\tnetmask {}\n\n".format(conf['vlan_dict']['auto'],
                                                                                                                   i+1,
-                                                                                                                  conf['vlan_dict']['auto'],
+                                                                                                                  conf['vlan_dict']['iface'],
                                                                                                                   i+1,
                                                                                                                   conf['vlan_dict']['inet'],
                                                                                                                   conf['vlan_dict']['vlan-raw-device'],
                                                                                                                   routers_list[i],
                                                                                                                   netmask_list[i])
+        #Ajoute le nom des différentes interfaces virtuelle dans une liste
+        iface_list.append(conf['vlan_dict']['iface'] + str(i+1))
     return vlan_config
+
+def generate_dhcp_iface_file(interfaces_list):
+    interfaces = ""
+    #Boucle sur la liste d'interfaces et création du string de configuration "interfaces" pour le fichier isc-dhcp-server
+    for iface in interfaces_list:
+        interfaces += iface + " "
+
+    file_conf = "INTERFACESv4=\"{}\"".format(interfaces)
+    return file_conf
 
 def main(argv):
     for subnet in argv:
         generate_dhcp_subnet(subnet)
 
     dhcp_config = ""
-
+    #Début de la config dhcpd grâce au dictionnaire "dhcp_dict" de la configuration yaml
     for conf_str, conf_value in conf['dhcp_dict'].items():
         dhcp_config += conf_str + " " + str(conf_value) + ";\n"
 
+    #Boucle sur le nombre de subnet de la liste subnet_list et déclaration des subnets grâces aux valeurs présentes dans les listes
     for i in range (len(subnet_list)): 
         dhcp_config += "\nsubnet {} netmask {}{{\n\toption routers {};\n\trange {};\n\toption broadcast-address {};\n}}\n".format(subnet_list[i],
                                                                                                                                netmask_list[i],
@@ -76,15 +94,17 @@ def main(argv):
     confirm_dhcp_conf = input("Cette configuration DHCP vous convient-elle ? (Y/N)")
 
     if confirm_dhcp_conf == "Y" :
-        if os.path.isfile(conf['path_dhcpd'] + conf['dhcpd_file_name']):
+        if os.path.isfile(conf['dhcpd_file_name']):
+            #Si le fichier dhcpd.conf existe alors backup
             try:
-                shutil.copyfile(conf['dhcpd_file_name'], conf['dhcpd_file_name']+'.bak')
+                shutil.copyfile(conf['dhcpd_file_name'], conf['dhcpd_file_name'] + '.bak')
             except OSError as err:
                 print("OS error: {0}".format(err))
                 sys.exit("Erreur lors du backup de dhcpd.conf")
 
+        #Ouverture du fichier dhcpd.conf avec l'attribut "w" afin d'écraser et écrire la nouvelle configuration
         try:
-            dhcpd = open(conf['path_dhcpd'] + conf['dhcpd_file_name'], "w")
+            dhcpd = open(conf['dhcpd_file_name'], "w")
             dhcpd.write(dhcp_config)
         except OSError as err:
                 print("OS error: {0}".format(err))
@@ -101,15 +121,17 @@ def main(argv):
     confirm_vlan_conf = input("La configuration VLAN vous convient-elle ? (Y/N)")
 
     if confirm_vlan_conf == "Y" :
-        if os.path.isfile(conf['path_iface'] + conf['iface_file_name']):
+        if os.path.isfile(conf['iface_file_name']):
+            #Backup du fichier interfaces 
             try:
-                shutil.copyfile(conf['iface_file_name'], conf['iface_file_name']+'.bak')
+                shutil.copyfile(conf['iface_file_name'], conf['iface_file_name'] +'.bak')
             except OSError as err:
                 print("OS error: {0}".format(err))
                 sys.exit("Erreur lors du backup du fichier interfaces")
 
+        #Ouverture du fichier interfaces avec l'attribut "a" donc écriture de la configuration vlan en fin de fichier
         try:
-            interfaces = open(conf['path_iface'] + conf['iface_file_name'], "a")
+            interfaces = open(conf['iface_file_name'], "a")
             interfaces.write("\n\n" + vlan_config)
         except OSError as err:
                 print("OS error: {0}".format(err))
@@ -118,6 +140,25 @@ def main(argv):
         print("Le fichier interface a été modifié")
     else :
         sys.exit("Relancer le script afin de générer la configuration VLAN qui vous convient")
+
+    isc = generate_dhcp_iface_file(iface_list)
+    if os.path.isfile(conf['dhcp_interface_file']):
+        #Si le fichier dhcpd.conf existe alors backup
+        try:
+            shutil.copyfile(conf['dhcp_interface_file'], conf['dhcp_interface_file'] + '.bak')
+        except OSError as err:
+            print("OS error: {0}".format(err))
+            sys.exit("Erreur lors du backup de isc-dhcp-server")
+
+        #Ouverture du fichier isc-dhcp-server avec l'attribut "w" afin d'écraser et écrire la nouvelle configuration
+        try:
+            dhcpd = open(conf['dhcp_interface_file'], "w")
+            dhcpd.write(isc)
+        except OSError as err:
+                print("OS error: {0}".format(err))
+                sys.exit("Erreur lors de l'écriture du fichier isc-dhcp-server")
+        dhcpd.close()
+        print("Le fichier isc-dhcp-server a été généré\n\n")
             
 
 if __name__ == "__main__":
@@ -128,15 +169,20 @@ if __name__ == "__main__":
         "python dhcp.py -s subnet1/netmask1CIDR subnet2/netmask2CIDR...\n\n"+
         "Exemple :\n"+
         "python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29", formatter_class=RawTextHelpFormatter)
+    #Ajout de l'argument --subnets pour déclarer les différents réseau à passer en argument au script
     parser.add_argument('-s','--subnets', nargs='+', default=[])
+    #Ajout de l'argument --config pour le chemin vers le fichier de configuration yaml
+    parser.add_argument('-c','--config', dest='filename', required=True, help="Chemin vers le fichier de configuration")
     args=parser.parse_args()
 
+    #Load le fichier de configuration yaml
     try:
-        conf = yaml.load(open('conf.yaml'))
+        conf = yaml.load(open(args.filename))
     except OSError as err:
         print("OS error: {0}".format(err))
         sys.exit("Erreur lors de l'ouverture du fichier de configuration")
 
+    #Tri des réseau par le masque de sous réseau en notation CIDR pour classer par ordre croissant
     order_network = sorted(args.subnets, key=lambda x: int(x.rsplit('/',1)[1]))
     main(order_network)
 

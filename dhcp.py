@@ -23,9 +23,10 @@ iface_list = []
 
 
 #Fonction generate_dhcp_subet :
-#Prend en argument une chaine de caractère qui est un réseau et son masque sous la notation CIDR (ex : 192.168.0.0/24)
 #Génère automatiquement le réseau, netmask, adresse broadcast, adresse du routeur et le range d’adresse IP
 #Remplie les listes correspondant à chaque caractéristique du réseau
+#Argument
+#   subnet : type -> chaîne de caractère / Réseau et son masque sous la notation CIDR (ex : 192.168.0.0/24)
 def generate_dhcp_subnet(subnet):    
     net = IPv4Network(subnet)
     
@@ -53,7 +54,8 @@ def generate_dhcp_subnet(subnet):
 #Fonction generate_vlan_interface :
 #Génère automatiquement les interfaces virtuelles en se basant sur les listes remplie par la fonction ‘generate_dhcp_subnet’ et sur un dictionnaire.
 #Remplie la liste des interfaces virtuelles qui sera utilisé pour le fichier 'isc-dhcp-server'
-#Retourne une chaîne de caractères : la configuration vlan à ajouter au fichier ‘interfaces’
+#Retour
+#   vlan_config : type -> chaîne de caractères / Configuration vlan à ajouter au fichier ‘interfaces’
 def generate_vlan_interface():
     vlan_config = ""
     #Boucle sur la longueur de la liste subnet_list pour créer les différentes interfaces
@@ -73,7 +75,8 @@ def generate_vlan_interface():
 #Fonction generate_dhcp_iface_file
 #Prend en argument la liste des interfaces remplie pendant l'execution de la fonction "generale_vlan_interface"
 #Boucle sur la longueur de cette liste et met en forme le texte pour le fichier de configuration "isc-dhcp-server"
-#Retourne une chaîne de caractères : la configuration à écrire dans le fichier
+#Retour
+#   file_conf : type -> chaîne de caractères / Configuration à écrire dans le fichier isc-dhcp-server
 def generate_dhcp_iface_file(interfaces_list):
     interfaces = ""
     #Boucle sur la liste d'interfaces et création du string de configuration "interfaces" pour le fichier isc-dhcp-server
@@ -87,7 +90,8 @@ def generate_dhcp_iface_file(interfaces_list):
 #Mise en forme de la configuration dhcpd
 #Affichage et vérification par l’utilisateur avant modification ou création de fichier
 #Backup des fichiers de configuration déjà existants
-#Prend en argument la liste de réseau passé en argument au script grâce à "--subnets"
+#Argument
+#   argv : type -> liste / Liste de réseau passé en argument au script grâce à "--subnets"
 def main(argv):
     for subnet in argv:
         generate_dhcp_subnet(subnet)

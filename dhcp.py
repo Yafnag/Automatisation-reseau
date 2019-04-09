@@ -22,7 +22,10 @@ broadcast_address_list = []
 iface_list = []
 
 
-
+#Fonction generate_dhcp_subet :
+#Prend en argument un réseau et son masque sous la notation CIDR (ex : 192.168.0.0/24)
+#Génère automatiquement le réseau, netmask, adresse broadcast, adresse du routeur et le range d’adresse IP
+#Remplie les listes correspondant à chaque caractéristique du réseau
 def generate_dhcp_subnet(subnet):    
     net = IPv4Network(subnet)
     
@@ -47,6 +50,10 @@ def generate_dhcp_subnet(subnet):
     else :
         sys.exit("Erreur lors du remplissage des listes subnet")
 
+#Fonction generate_vlan_interface :
+#Génère automatiquement les interfaces virtuelles en se basant sur les listes remplie par la fonction ‘generate_dhcp_subnet’ et sur un dictionnaire.
+#Remplie la liste des interfaces virtuelles qui sera utilisé pour le fichier 'isc-dhcp-server'
+#Cette fonction retourne la configuration vlan à ajouter au fichier ‘interfaces’
 def generate_vlan_interface():
     vlan_config = ""
     #Boucle sur la longueur de la liste subnet_list pour créer les différentes interfaces
@@ -63,6 +70,10 @@ def generate_vlan_interface():
         iface_list.append(conf['vlan_dict']['iface'] + str(i+1))
     return vlan_config
 
+#Fonction generate_dhcp_iface_file
+#Prend en argument la liste des interfaces remplie pendant l'execution de la fonction "generale_vlan_interface"
+#Boucle sur la longueur de cette liste et met en forme le texte pour le fichier de configuration "isc-dhcp-server"
+#Retourne la configuration à écrire dans le fichier
 def generate_dhcp_iface_file(interfaces_list):
     interfaces = ""
     #Boucle sur la liste d'interfaces et création du string de configuration "interfaces" pour le fichier isc-dhcp-server
@@ -72,6 +83,11 @@ def generate_dhcp_iface_file(interfaces_list):
     file_conf = "INTERFACESv4=\"{}\"".format(interfaces)
     return file_conf
 
+#Fonction main
+#Mise en forme de la configuration dhcpd
+#Affichage et vérification par l’utilisateur avant modification ou création de fichier
+#Backup des fichiers de configuration déjà existants
+#Prend en argument la liste de réseau passé en argument au script grâce à "--subnets"
 def main(argv):
     for subnet in argv:
         generate_dhcp_subnet(subnet)
@@ -163,12 +179,13 @@ def main(argv):
 
 if __name__ == "__main__":
     parser=argparse.ArgumentParser(
-        description="Pour executer le script il faut editer le fichier de configuration conf.yaml.\n"+
+        description="Editer le fichier de configuration conf.yaml.\n"+
         "\t- Renseigner les serveurs DNS qui seront attribués par le serveur DHCP à la ligne \"option domain-name-servers\".\n"+
-        "\t- Renseigner le nom de l'interface réseau sur laquel seront générés les VLANs à la ligne \"vlan_raw_device\"\n\n"+
-        "python dhcp.py -s subnet1/netmask1CIDR subnet2/netmask2CIDR...\n\n"+
+        "\t- Renseigner le nom de l'interface réseau sur laquel seront générés les VLANs à la ligne \"vlan_raw_device\"\n"+
+        "\t- Configurer les chemins d'accès aux fichiers de configurations \"isc-dhcp-server\", \"dhcpd.conf\" et \"interfaces\"\n\n"+
+        "python dhcp.py -c path/to/conf.yaml -s subnet1/netmask1CIDR subnet2/netmask2CIDR...\n\n"+
         "Exemple :\n"+
-        "python dhcp.py -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29", formatter_class=RawTextHelpFormatter)
+        "python dhcp.py -c./ conf.yaml -s 192.168.0.0/25 192.168.0.128/27 192.168.0.160/28 192.168.0.176/28 192.168.0.192/29", formatter_class=RawTextHelpFormatter)
     #Ajout de l'argument --subnets pour déclarer les différents réseau à passer en argument au script
     parser.add_argument('-s','--subnets', nargs='+', default=[])
     #Ajout de l'argument --config pour le chemin vers le fichier de configuration yaml

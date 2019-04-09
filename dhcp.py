@@ -23,7 +23,7 @@ iface_list = []
 
 
 #Fonction generate_dhcp_subet :
-#Prend en argument un réseau et son masque sous la notation CIDR (ex : 192.168.0.0/24)
+#Prend en argument une chaine de caractère qui est un réseau et son masque sous la notation CIDR (ex : 192.168.0.0/24)
 #Génère automatiquement le réseau, netmask, adresse broadcast, adresse du routeur et le range d’adresse IP
 #Remplie les listes correspondant à chaque caractéristique du réseau
 def generate_dhcp_subnet(subnet):    
@@ -53,7 +53,7 @@ def generate_dhcp_subnet(subnet):
 #Fonction generate_vlan_interface :
 #Génère automatiquement les interfaces virtuelles en se basant sur les listes remplie par la fonction ‘generate_dhcp_subnet’ et sur un dictionnaire.
 #Remplie la liste des interfaces virtuelles qui sera utilisé pour le fichier 'isc-dhcp-server'
-#Cette fonction retourne la configuration vlan à ajouter au fichier ‘interfaces’
+#Retourne une chaîne de caractères : la configuration vlan à ajouter au fichier ‘interfaces’
 def generate_vlan_interface():
     vlan_config = ""
     #Boucle sur la longueur de la liste subnet_list pour créer les différentes interfaces
@@ -73,7 +73,7 @@ def generate_vlan_interface():
 #Fonction generate_dhcp_iface_file
 #Prend en argument la liste des interfaces remplie pendant l'execution de la fonction "generale_vlan_interface"
 #Boucle sur la longueur de cette liste et met en forme le texte pour le fichier de configuration "isc-dhcp-server"
-#Retourne la configuration à écrire dans le fichier
+#Retourne une chaîne de caractères : la configuration à écrire dans le fichier
 def generate_dhcp_iface_file(interfaces_list):
     interfaces = ""
     #Boucle sur la liste d'interfaces et création du string de configuration "interfaces" pour le fichier isc-dhcp-server
